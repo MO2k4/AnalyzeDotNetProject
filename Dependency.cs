@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AnalyzeDotNetProject
 {
@@ -20,6 +21,8 @@ namespace AnalyzeDotNetProject
             public string Parent { get; set; }
 
             public List<Dependency> Children { get; set; } = new List<Dependency>();
+
+            public List<Dependency> ContainingPackages { get; set; }
 
             public bool Equals(Dependency other)
             {
@@ -44,7 +47,7 @@ namespace AnalyzeDotNetProject
                 }
             }
 
-            public override string ToString() => $"{Name} - {Version}";
+            public override string ToString() => $"{Name} - {Version} => ContainingPackages: {string.Join(", ", ContainingPackages?.Select(p => p.Parent))}";
         }
     }
 }

@@ -39,12 +39,27 @@ namespace AnalyzeDotNetProject
                         {
                             var projectLibrary = lockFileTargetFramework.Libraries.FirstOrDefault(library => library.Name == dependency.Name);
                             var reportDependency = ReportDependency(projectLibrary, lockFileTargetFramework, 1);
+                            
+                            if (reportDependency == null) continue;
+                            
                             dependencies.Add(reportDependency);
                         }
                     }
 
                     var childrenDependencies = dependencies.SelectMany(dep => dep.Children).ToList();
-                    var removableDependencies = dependencies.Where(dep => childrenDependencies.Contains(dep)).ToArray();
+                    var removableDependencies = new List<Dependency>();
+
+                    foreach (var dependency in dependencies)
+                    {
+                        var children = childrenDependencies.Where(c => c.Equals(dependency)).ToList();
+
+                        if (children.Count > 0)
+                        {
+                            dependency.ContainingPackages = children;
+                            removableDependencies.Add(dependency);
+                        }
+                    }
+
                     var removableContent = string.Join(Environment.NewLine + new string(' ', 3), removableDependencies.Select(dep => dep.ToString()));
 
                     if (removableContent.Length > 0)
@@ -52,6 +67,7 @@ namespace AnalyzeDotNetProject
                         stringBuilder.AppendLine();
                         stringBuilder.AppendLine("Removable Dependencies");
                         stringBuilder.Append(new string(' ', 3) + removableContent);
+                        stringBuilder.AppendLine();
                         stringBuilder.AppendLine();
                     }
                 }
@@ -63,13 +79,16 @@ namespace AnalyzeDotNetProject
 
         private static Dependency ReportDependency(LockFileTargetLibrary projectLibrary, LockFileTarget lockFileTargetFramework, int indentLevel, Dependency dependency = null)
         {
+            if (projectLibrary == null)
+                return null;
+
             if (indentLevel == 1)
                 dependency = new Dependency(projectLibrary.Name, projectLibrary.Version.OriginalVersion);
             else
-                dependency.Children.Add(new Dependency(projectLibrary.Name, projectLibrary.Version.OriginalVersion) { Parent = dependency.Parent });
+                dependency.Children.Add(new Dependency(projectLibrary.Name, projectLibrary.Version.OriginalVersion) { Parent = dependency.Name });
 
-            stringBuilder.Append(new string(' ', indentLevel * 2));
-            stringBuilder.AppendLine($"{projectLibrary.Name}, v{projectLibrary.Version}");
+            // stringBuilder.Append(new string(' ', indentLevel * 2));
+            // stringBuilder.AppendLine($"{projectLibrary.Name}, v{projectLibrary.Version}");
 
             foreach (var childDependency in projectLibrary.Dependencies)
             {
