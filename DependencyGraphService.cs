@@ -16,8 +16,8 @@ namespace AnalyzeDotNetProject
             var dotNetRunner = new DotNetRunner();
 
             string dgOutput = Path.Combine(Path.GetTempPath(), Path.GetTempFileName());
-                
-            string[] arguments = new[] {"msbuild", $"\"{projectPath}\"", "/t:GenerateRestoreGraphFile", $"/p:RestoreGraphOutputPath={dgOutput}"};
+
+            string[] arguments = new[] { "msbuild", $"\"{projectPath}\"", "/t:GenerateRestoreGraphFile", $"/p:RestoreGraphOutputPath=\"{dgOutput}\"" };
 
             var runStatus = dotNetRunner.Run(Path.GetDirectoryName(projectPath), arguments);
 
