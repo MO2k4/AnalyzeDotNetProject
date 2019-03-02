@@ -13,7 +13,7 @@ namespace AnalyzeDotNetProject
         public static void Main(string[] args)
         {
             // Replace to point to your project or solution
-            string projectPath = @"xxx";
+            string projectPath = @"C:\LB\VEKM\Lb.Vekm.Event.Database\src\Lb.VEKM.Event.Database.sln";
 
             var dependencyGraphService = new DependencyGraphService();
             var dependencyGraph = dependencyGraphService.GenerateDependencyGraph(projectPath);
@@ -39,9 +39,9 @@ namespace AnalyzeDotNetProject
                         {
                             var projectLibrary = lockFileTargetFramework.Libraries.FirstOrDefault(library => library.Name == dependency.Name);
                             var reportDependency = ReportDependency(projectLibrary, lockFileTargetFramework, 1);
-                            
+
                             if (reportDependency == null) continue;
-                            
+
                             dependencies.Add(reportDependency);
                         }
                     }
@@ -84,8 +84,6 @@ namespace AnalyzeDotNetProject
 
             if (indentLevel == 1)
                 dependency = new Dependency(projectLibrary.Name, projectLibrary.Version.OriginalVersion);
-            else
-                dependency.Children.Add(new Dependency(projectLibrary.Name, projectLibrary.Version.OriginalVersion) { Parent = dependency.Name });
 
             // stringBuilder.Append(new string(' ', indentLevel * 2));
             // stringBuilder.AppendLine($"{projectLibrary.Name}, v{projectLibrary.Version}");
@@ -93,6 +91,7 @@ namespace AnalyzeDotNetProject
             foreach (var childDependency in projectLibrary.Dependencies)
             {
                 var childLibrary = lockFileTargetFramework.Libraries.FirstOrDefault(library => library.Name == childDependency.Id);
+                dependency.Children.Add(new Dependency(childDependency.Id, childDependency.VersionRange.MinVersion.OriginalVersion) { Parent = dependency.Name });
                 ReportDependency(childLibrary, lockFileTargetFramework, indentLevel + 1, dependency);
             }
 
