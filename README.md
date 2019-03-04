@@ -2,7 +2,7 @@
 
 When developing dotnet and upgrading to the new csproj-format, i had to find a way to cleanup nuget transitive dependencies.
 
-![](https://www.erikheemskerk.nl/content/images/2017/09/TransitiveReferencesDotNetCore.png | width=300)
+<img src="https://www.erikheemskerk.nl/content/images/2017/09/TransitiveReferencesDotNetCore.png" width="300" />
 
 I stumbled upon this thread ([Part 1](https://www.jerriepelser.com/blog/analyze-dotnet-project-dependencies-part-1/)/[Part 2](https://www.jerriepelser.com/blog/analyze-dotnet-project-dependencies-part-2/)) from Jerrie Pelser. He wrote a application to visualize the dependency tree of a dotnet-Project.
 
